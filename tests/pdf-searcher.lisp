@@ -17,7 +17,7 @@
 
 ;; NOTE: To run this test file, execute `(asdf:test-system :pdf-searcher)' in your Lisp.
 
-(plan 4)
+(plan 5)
 
 (is-values (find-pdf-files-with-mentions (test-pdf "pdf/*") "test")
 	   `((,(test-pdf "pdf/test1.pdf") ,(test-pdf "pdf/test2.pdf")) nil))
@@ -27,6 +27,9 @@
 
 (is-values (find-pdf-files-with-mentions (test-pdf "pdf/*") "test1")
 	   `((,(test-pdf "pdf/test1.pdf")) (,(test-pdf "pdf/test2.pdf"))))
+
+(is-values (find-pdf-files-with-mentions (test-pdf "pdf/*") "test3")
+	   `(nil (,(test-pdf "pdf/test1.pdf") ,(test-pdf "pdf/test2.pdf"))))
 
 (is-error (find-pdf-files-with-mentions (test-pdf "pdf/test3.pdf") "test")
 	  'type-error)
