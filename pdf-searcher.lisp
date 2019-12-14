@@ -9,6 +9,11 @@
    :cl-ppcre
    :scan
    :create-scanner)
+  (:import-from
+   :cl-fad
+   :directory-exists-p
+   :list-directory
+   :directory-pathname-p)
   (:export
    :find-pdf-files-with-mentions))
 
@@ -22,14 +27,12 @@
 Searches all pdf files recrursively under the root-pathname provided, and returns the list of files which has the search-string specified. The second value returned is a list of files which was determined to be unreadable. Uses pdftotext linux tool.
 "
   (labels ((collect-directories (unchecked-directories directory-list)
-	     (print unchecked-directories)
 	     (if (not (car unchecked-directories))
 		 directory-list
 		 (collect-directories (append (cdr unchecked-directories)
-					      (directory (concatenate 'string
-								      (directory-namestring (car unchecked-directories))
-								      "*")))
-				      (append directory-list (list (car unchecked-directories)))))))
+					      (list-directory (directory-namestring (car unchecked-directories))))
+				      (append directory-list (when (directory-pathname-p (car unchecked-directories))
+							       (list (car unchecked-directories))))))))
     (let ((root-pathname (remove #\/ root-pathname :from-end t :count 1 :start (- (length root-pathname) 1))))
       (values-list
        (loop for pdf-file in (apply #'append
@@ -47,7 +50,7 @@ Searches all pdf files recrursively under the root-pathname provided, and return
 								(directory-namestring pdf-dir)
 								"*.pdf"))))
 					;for i from 0 upto 1
-	     do (print pdf-file)
+	     ;do (print pdf-file)
 	     if (scan
 		 (create-scanner (list :sequence
 				       :case-insensitive-p
